@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { voices } from "../content";
 import City from "./City";
+import HoverColor from "./HoverColor";
 
 // Poster-style ensemble: cut-out portraits rise behind the skyline in three rows,
 // legends at the back under the moon. x/y are percentages of the hero, w is vw.
@@ -54,7 +55,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="hero" id="top" ref={hero}>
+    <section className="hero" id="top" ref={hero} data-anim>
       <div className="hero-sky" aria-hidden="true">
         <span className="hero-stars" />
         <span className="hero-moon" />
@@ -97,7 +98,7 @@ export default function Hero() {
               >
                 <span className="legend-img">
                   <Image src={`/images/cut/bw/${v.cut}.png`} alt="" fill sizes="(max-width: 820px) 40vw, 22vw" className="legend-bw" />
-                  <Image src={`/images/cut/color/${v.cut}.png`} alt="" fill sizes="(max-width: 820px) 40vw, 22vw" className="legend-color" />
+                  <HoverColor src={`/images/cut/color/${v.cut}.png`} sizes="22vw" className="legend-color" within=".legend-link" />
                 </span>
               </a>
             </li>

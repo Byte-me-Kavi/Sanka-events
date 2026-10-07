@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { editions, voices, type Edition } from "../content";
 import City from "./City";
+import HoverColor from "./HoverColor";
 import LightField from "./LightField";
 import Lightbox, { type LightboxItem } from "./Lightbox";
 
@@ -131,7 +132,7 @@ function Chapter({
               <li key={v.name} style={{ "--i": i } as React.CSSProperties}>
                 <span className="chapter-face">
                   <Image src={`/images/cut/bw/${v.cut}.png`} alt="" fill sizes="96px" className="face-bw" />
-                  <Image src={`/images/cut/color/${v.cut}.png`} alt="" fill sizes="96px" className="face-color" />
+                  <HoverColor src={`/images/cut/color/${v.cut}.png`} sizes="96px" className="face-color" within="li" />
                 </span>
                 <span className="chapter-face-name">{v.name}</span>
               </li>

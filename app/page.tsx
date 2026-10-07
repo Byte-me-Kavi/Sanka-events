@@ -3,6 +3,7 @@ import Contact from "./components/Contact";
 import Editions from "./components/Editions";
 import Hero from "./components/Hero";
 import Loader from "./components/Loader";
+import AnimationPauser from "./components/AnimationPauser";
 import Highlights from "./components/Highlights";
 import Nav from "./components/Nav";
 import Services from "./components/Services";
@@ -27,7 +28,7 @@ function Marquee() {
     </div>
   );
   return (
-    <div className="marquee">
+    <div className="marquee" data-anim>
       {row(false)}
       {row(true)}
     </div>
@@ -38,6 +39,7 @@ export default function Home() {
   return (
     <>
       <Loader />
+      <AnimationPauser />
       <Nav />
       <main>
         <Hero />

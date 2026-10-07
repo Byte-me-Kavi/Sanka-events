@@ -12,7 +12,7 @@ type Heart = { x: number; y: number; w: number; h: number; d: number };
 type Landmark = { kind: "lotus" | "heart"; x: number; y: number; s: number };
 type Layer = {
   shape: HTMLCanvasElement;
-  lights: HTMLCanvasElement;
+  lights: HTMLCanvasElement | null;
   extra: number;
   depth: number;
   twinkles: Twinkle[];
@@ -64,6 +64,7 @@ export default function City({
     let W = 0;
     let H = 0;
     let dpr = 1;
+    let frameMs = 32;
     let layers: Layer[] = [];
     let raf = 0;
     let inView = true;
@@ -74,7 +75,8 @@ export default function City({
       const rect = canvas.getBoundingClientRect();
       W = rect.width;
       H = rect.height;
-      dpr = mode === "walk" ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+      dpr = mode === "walk" || W < 700 ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+      frameMs = W < 700 ? 42 : 32;
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
 
@@ -231,8 +233,21 @@ export default function City({
         ctx.drawImage(L.shape, 0, 0, L.shape.width, L.shape.height, ox, oy, L.shape.width / dpr, L.shape.height / dpr);
         const on = elapsed < 0 ? 0 : Math.min(1, Math.max(0, (elapsed - i * 380) / 1300));
         if (on <= 0) return;
+        if (L.lights) {
+          if (on >= 1) {
+            // lights are fully on: bake them into the skyline and free the extra canvas
+            const g = L.shape.getContext("2d")!;
+            g.setTransform(1, 0, 0, 1, 0, 0);
+            g.drawImage(L.lights, 0, 0);
+            g.setTransform(dpr, 0, 0, dpr, 0, 0);
+            L.lights.width = L.lights.height = 0;
+            L.lights = null;
+          } else {
+            ctx.globalAlpha = on;
+            ctx.drawImage(L.lights, 0, 0, L.lights.width, L.lights.height, ox, oy, L.lights.width / dpr, L.lights.height / dpr);
+          }
+        }
         ctx.globalAlpha = on;
-        ctx.drawImage(L.lights, 0, 0, L.lights.width, L.lights.height, ox, oy, L.lights.width / dpr, L.lights.height / dpr);
 
         const spec = SPECS[i];
         for (const k of L.twinkles) {
@@ -284,8 +299,16 @@ export default function City({
       });
     };
 
+    // twinkles and parallax read fine at ~30fps; halving redraws keeps scrolling smooth
+    let last = -1;
+    let lastPan = -1;
     const loop = (now: number) => {
-      draw(now);
+      const pan = panRef?.current ?? 0;
+      if (now - last >= frameMs || pan !== lastPan) {
+        last = now;
+        lastPan = pan;
+        draw(now);
+      }
       if (inView) raf = requestAnimationFrame(loop);
     };
     const kick = () => {

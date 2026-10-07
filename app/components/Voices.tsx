@@ -4,6 +4,7 @@ import { useInView } from "motion/react";
 import Image from "next/image";
 import { useRef } from "react";
 import { voices } from "../content";
+import HoverColor from "./HoverColor";
 
 // Rows of 4 legends, 3 headliners, 4 new voices: 11 tiles on a 12-column grid, no empty cells.
 const span = (i: number) => (i < 4 ? "tile--3" : i < 7 ? "tile--4" : "tile--3");
@@ -28,7 +29,7 @@ export default function Voices() {
             <div className="tile-stage" aria-hidden="true">
               <span className="tile-beam" />
               <Image src={`/images/cut/bw/${v.cut}.png`} alt="" fill sizes="(max-width: 820px) 50vw, 25vw" className="tile-bw" />
-              <Image src={`/images/cut/color/${v.cut}.png`} alt="" fill sizes="(max-width: 820px) 50vw, 25vw" className="tile-color" />
+              <HoverColor src={`/images/cut/color/${v.cut}.png`} sizes="25vw" className="tile-color" within=".tile" />
             </div>
             <div className="tile-info">
               <h3>{v.name}</h3>

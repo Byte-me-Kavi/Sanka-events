@@ -117,8 +117,7 @@ p {
 .btn--ghost {
   border-color: var(--line-strong);
   color: var(--light);
-  background: rgba(255, 241, 207, 0.04);
-  backdrop-filter: blur(6px);
+  background: rgba(10, 4, 14, 0.55);
 }
 .btn--ghost:hover {
   border-color: var(--light);
@@ -133,14 +132,29 @@ p {
   overflow: hidden;
   cursor: pointer;
   background: linear-gradient(180deg, #000 0%, #07020c 40%, #1a0820 76%, #3a1030 100%);
-  clip-path: inset(0 0 0 0);
-  transition: clip-path 1.15s var(--ease-io);
+  transition: transform 0.9s var(--ease-io);
 }
 .seen-intro .loader {
   display: none;
 }
+/* fail-safe: even if JavaScript never runs, the loader steps aside after a few seconds */
+.loader {
+  animation: loader-failsafe 0.6s ease 8s forwards;
+}
+@keyframes loader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+/* sections off screen pause their CSS animations (toggled by AnimationPauser) */
+.anim-off,
+.anim-off * {
+  animation-play-state: paused !important;
+}
 .loader.is-exit {
-  clip-path: inset(0 0 100% 0);
+  transform: translateY(-100%);
   pointer-events: none;
 }
 .loader-stars {
@@ -167,11 +181,8 @@ p {
   transform-origin: 50% 100%;
   clip-path: polygon(0 0, 100% 0, 52.5% 100%, 47.5% 100%);
   background: linear-gradient(0deg, rgba(255, 241, 207, 0.42), rgba(255, 241, 207, 0.1) 45%, transparent 85%);
-  filter: blur(3px);
-  mix-blend-mode: screen;
   opacity: 0;
   animation: beam-on 0.9s var(--ease-out) forwards;
-  transition: filter 0.6s;
 }
 .loader-beam:nth-child(2) {
   animation-delay: 0.15s;
@@ -184,10 +195,6 @@ p {
 }
 .loader-beam--rose {
   background: linear-gradient(0deg, rgba(255, 92, 147, 0.5), rgba(214, 63, 124, 0.13) 45%, transparent 85%);
-}
-.loader.is-finale .loader-beam,
-.loader.is-exit .loader-beam {
-  filter: blur(2px) brightness(1.5);
 }
 @keyframes beam-on {
   to {
@@ -214,7 +221,6 @@ p {
   width: min(58vw, 440px);
   height: auto;
   opacity: calc(0.14 + var(--p) * 0.86);
-  filter: drop-shadow(0 0 calc(var(--p) * 22px) rgba(255, 214, 170, 0.35));
 }
 .loader.is-finale .loader-mark img,
 .loader.is-exit .loader-mark img {
@@ -243,33 +249,6 @@ p {
   opacity: 1;
   transform: none;
 }
-.loader-meter {
-  position: absolute;
-  left: 50%;
-  top: calc(40% + min(26vw, 190px));
-  z-index: 1;
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  transform: translateX(-50%);
-  font-size: 14.5px;
-  color: var(--ash);
-  white-space: nowrap;
-}
-.loader-meter span:first-child {
-  transition: color 0.4s;
-}
-.loader.is-finale .loader-meter span:first-child,
-.loader.is-exit .loader-meter span:first-child {
-  color: var(--gold-bright);
-}
-.loader-pct {
-  min-width: 3.4ch;
-  font: 700 18px/1 var(--font-d);
-  font-variant-numeric: tabular-nums;
-  color: var(--light);
-}
-
 /* ---------- Nav ---------- */
 .nav {
   position: fixed;
@@ -286,8 +265,7 @@ p {
   border-bottom: 1px solid transparent;
 }
 .nav.is-solid {
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(14px) saturate(140%);
+  background: rgba(3, 1, 5, 0.9);
   border-bottom-color: var(--line);
 }
 .nav.is-hidden {
@@ -546,7 +524,6 @@ html[data-intro-done] .hero-beams {
   background: linear-gradient(0deg, rgba(255, 241, 207, 0.14), rgba(255, 241, 207, 0) 80%);
   clip-path: polygon(0 0, 100% 0, 53% 100%, 47% 100%);
   transform-origin: 50% 100%;
-  filter: blur(4px);
   animation: searchlight 10s var(--ease-io) infinite alternate;
 }
 .hero-beams span:nth-child(1) {
@@ -649,8 +626,7 @@ html[data-intro-done] .legend {
   padding: 8px 16px 7px;
   border-radius: 999px;
   border: 1px solid rgba(242, 196, 107, 0.6);
-  background: rgba(8, 3, 12, 0.88);
-  backdrop-filter: blur(8px);
+  background: rgba(8, 3, 12, 0.92);
   box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.8);
   color: var(--gold-bright);
   font: 700 16px/1 var(--font-d);
@@ -910,8 +886,7 @@ html[data-intro-done] .hero-actions {
   padding: 16px 22px;
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: rgba(8, 3, 12, 0.72);
-  backdrop-filter: blur(10px);
+  background: rgba(10, 4, 14, 0.88);
   color: var(--light);
   font: inherit;
   text-align: left;
@@ -1630,8 +1605,7 @@ html[data-intro-done] .hero-actions {
   height: 46px;
   border-radius: 50%;
   border: 1px solid var(--line-strong);
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.6);
   cursor: pointer;
   transition:
     background-color 0.2s,
@@ -1968,7 +1942,6 @@ html[data-intro-done] .hero-actions {
   transform-box: fill-box;
   transform-origin: 50% 0;
   animation: beam-swing 4.5s var(--ease-io) infinite alternate;
-  mix-blend-mode: screen;
   opacity: 0.6;
 }
 @keyframes beam-swing {
@@ -2073,8 +2046,7 @@ html[data-intro-done] .hero-actions {
 }
 .phone-glow {
   fill: var(--light);
-  opacity: 0.35;
-  filter: blur(3px);
+  opacity: 0.3;
   animation: phone-twinkle 2.6s ease-in-out infinite alternate;
 }
 @keyframes phone-twinkle {

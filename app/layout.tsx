@@ -5,7 +5,7 @@ import "./globals.css";
 const display = Abhaya_Libre({
   variable: "--font-display",
   subsets: ["latin", "sinhala"],
-  weight: ["400", "500", "700", "800"],
+  weight: ["500", "700", "800"],
 });
 
 const body = Hanken_Grotesk({
@@ -13,7 +13,15 @@ const body = Hanken_Grotesk({
   subsets: ["latin"],
 });
 
+// Set NEXT_PUBLIC_SITE_URL to the live domain (e.g. https://sanka.lk) so share previews use absolute URLs
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "SANKA | Snehaye Nagaraya, the City of Love",
   description:
     "SANKA presents Snehaye Nagaraya, the City of Love: four sold-out concerts in Kandy and Colombo with the legends of Sinhala song. Plus wedding and event management, stage, sound, lighting, bands and LED walls.",

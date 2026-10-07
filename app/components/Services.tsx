@@ -58,7 +58,7 @@ export default function Services() {
       </header>
 
       <div className="services-grid">
-        <div className="stage-wrap">
+        <div className="stage-wrap" data-anim>
           <svg
             className="stage-svg"
             data-active={active ?? "all"}
@@ -79,34 +79,38 @@ export default function Services() {
                 <stop offset="0%" stopColor="#D63F7C" stopOpacity="0.35" />
                 <stop offset="100%" stopColor="#D63F7C" stopOpacity="0" />
               </radialGradient>
-              <pattern id="pixels" width="5" height="5" patternUnits="userSpaceOnUse">
-                <rect width="5" height="5" fill="#000" />
-                <rect x="0.6" y="0.6" width="3.8" height="3.8" fill="#fff" />
+              <pattern id="pixelGrid" width="5" height="5" patternUnits="userSpaceOnUse">
+                <path d="M0 0.4H5M0.4 0V5" stroke="#000" strokeWidth="1.2" />
               </pattern>
-              <mask id="pixelMask">
-                <rect x="180" y="92" width="280" height="170" fill="url(#pixels)" />
-              </mask>
+              <radialGradient id="ledRose">
+                <stop offset="0%" stopColor="#D63F7C" />
+                <stop offset="100%" stopColor="#D63F7C" stopOpacity="0" />
+              </radialGradient>
+              <radialGradient id="ledGold">
+                <stop offset="0%" stopColor="#C9A25A" />
+                <stop offset="100%" stopColor="#C9A25A" stopOpacity="0" />
+              </radialGradient>
+              <radialGradient id="ledViolet">
+                <stop offset="0%" stopColor="#7B3FD6" />
+                <stop offset="100%" stopColor="#7B3FD6" stopOpacity="0" />
+              </radialGradient>
               <clipPath id="ledClip">
                 <rect x="180" y="92" width="280" height="170" />
               </clipPath>
-              <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="14" />
-              </filter>
             </defs>
 
             {/* LED wall */}
             <g data-layer="led event" className="layer layer--led">
               <rect x="176" y="88" width="288" height="178" rx="2" className="led-frame" />
               <g clipPath="url(#ledClip)">
-                <g mask="url(#pixelMask)">
-                  <rect x="180" y="92" width="280" height="170" fill="#1a0b22" />
-                  <g className="led-content" filter="url(#soft)">
-                    <ellipse cx="200" cy="150" rx="90" ry="60" fill="#D63F7C" />
-                    <ellipse cx="330" cy="210" rx="110" ry="55" fill="#C9A25A" />
-                    <ellipse cx="460" cy="130" rx="90" ry="70" fill="#7B3FD6" />
-                    <ellipse cx="590" cy="200" rx="100" ry="60" fill="#D63F7C" />
-                  </g>
+                <rect x="180" y="92" width="280" height="170" fill="#1a0b22" />
+                <g className="led-content">
+                  <ellipse cx="200" cy="150" rx="120" ry="85" fill="url(#ledRose)" />
+                  <ellipse cx="330" cy="210" rx="140" ry="80" fill="url(#ledGold)" />
+                  <ellipse cx="460" cy="130" rx="120" ry="95" fill="url(#ledViolet)" />
+                  <ellipse cx="590" cy="200" rx="130" ry="85" fill="url(#ledRose)" />
                 </g>
+                <rect x="180" y="92" width="280" height="170" fill="url(#pixelGrid)" />
               </g>
             </g>
 

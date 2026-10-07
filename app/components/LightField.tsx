@@ -59,7 +59,7 @@ export default function LightField({ className = "" }: { className?: string }) {
       W = canvas.offsetWidth;
       H = canvas.offsetHeight;
       if (!W || !H) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = W < 700 ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -124,8 +124,12 @@ export default function LightField({ className = "" }: { className?: string }) {
       ctx.globalCompositeOperation = "source-over";
     };
 
+    let last = -1;
     const loop = (now: number) => {
-      draw(now);
+      if (now - last >= 32) {
+        last = now;
+        draw(now);
+      }
       if (inView && !reduce) raf = requestAnimationFrame(loop);
     };
 
