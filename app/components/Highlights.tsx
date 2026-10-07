@@ -61,6 +61,7 @@ export default function Highlights() {
   const [visible, setVisible] = useState(false);
   const [lb, setLb] = useState<number | null>(null);
   const reel = useRef<HTMLDivElement>(null);
+  const swipeX = useRef<number | null>(null);
 
   useEffect(() => {
     const el = reel.current;
@@ -91,6 +92,14 @@ export default function Highlights() {
         ref={reel}
         onPointerEnter={(e) => e.pointerType === "mouse" && setPaused(true)}
         onPointerLeave={() => setPaused(false)}
+        onTouchStart={(e) => (swipeX.current = e.touches[0].clientX)}
+        onTouchEnd={(e) => {
+          if (swipeX.current === null) return;
+          const dx = e.changedTouches[0].clientX - swipeX.current;
+          swipeX.current = null;
+          if (Math.abs(dx) < 45) return;
+          setIndex((i) => (i + (dx < 0 ? 1 : -1) + photos.length) % photos.length);
+        }}
       >
         <div className="reel-bars" role="tablist" aria-label="Highlights">
           {photos.map((p, i) => (

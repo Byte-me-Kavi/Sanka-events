@@ -2,7 +2,7 @@
 
 import { useInView } from "motion/react";
 import Image from "next/image";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { voices } from "../content";
 import HoverColor from "./HoverColor";
 
@@ -12,6 +12,20 @@ const span = (i: number) => (i < 4 ? "tile--3" : i < 7 ? "tile--4" : "tile--3");
 export default function Voices() {
   const grid = useRef<HTMLUListElement>(null);
   const seen = useInView(grid, { once: true, amount: 0.15 });
+
+  // phones can't hover: whichever row crosses the middle of the screen gets the stage light
+  useEffect(() => {
+    const ul = grid.current;
+    if (!ul || !window.matchMedia("(max-width: 820px)").matches) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) en.target.classList.toggle("is-lit", en.isIntersecting);
+      },
+      { rootMargin: "-38% 0px -38% 0px" },
+    );
+    ul.querySelectorAll(".tile").forEach((t) => io.observe(t));
+    return () => io.disconnect();
+  }, []);
 
   return (
     <section className="voices" id="voices" aria-labelledby="voices-title">

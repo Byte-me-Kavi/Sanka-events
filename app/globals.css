@@ -2525,6 +2525,282 @@ html[data-intro-done] .hero-actions {
   }
 }
 
+/* ---------- Mobile storytelling (phones only; desktop is untouched) ---------- */
+.legend-spot,
+.walk-mbar,
+.walk-next {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  /* hero spotlight: one artist at a time, named in a caption over the skyline */
+  .legend-spot {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 7vw;
+    z-index: 2;
+    text-align: center;
+    pointer-events: none;
+  }
+  .legend-spot > span {
+    display: inline-grid;
+    gap: 3px;
+    padding: 10px 18px 9px;
+    border: 1px solid rgba(242, 196, 107, 0.5);
+    border-radius: 16px;
+    background: rgba(8, 3, 12, 0.85);
+    animation: caption-in 0.55s var(--ease-out);
+  }
+  .legend-spot strong {
+    font: 700 20px/1.1 var(--font-d);
+    color: var(--gold-bright);
+  }
+  .legend-spot small {
+    font-size: 12.5px;
+    color: var(--ash);
+  }
+  .legends.has-featured .legend:not(.is-featured) .legend-img {
+    filter: brightness(0.5);
+  }
+  .legend.is-featured {
+    z-index: 20 !important;
+  }
+  .legend.is-featured .legend-img {
+    transform: scale(1.12) translateY(-3%);
+    filter: brightness(1.15);
+  }
+
+  /* city walk: sticky "you are here" bar */
+  .walk-mbar {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    display: block;
+    height: 56px;
+    margin-bottom: -56px;
+    padding: 12px var(--gutter) 0;
+    background: linear-gradient(180deg, rgba(5, 2, 8, 0.96), rgba(5, 2, 8, 0.82));
+    border-bottom: 1px solid var(--line);
+  }
+  .walk-mbar p {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--ash);
+    white-space: nowrap;
+  }
+  .walk-mbar strong {
+    font: 700 19px/1 var(--font-d);
+    color: var(--gold-bright);
+    animation: caption-in 0.5s var(--ease-out);
+  }
+  .walk-mbar p span {
+    margin-left: auto;
+    font: 700 14px/1 var(--font-d);
+    color: var(--light);
+  }
+  .walk-mbar-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+  }
+  .walk-mbar-line span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--rose), var(--gold-bright));
+    transform-origin: left;
+  }
+
+  /* chapters: a ghost number drifts behind each night */
+  .chapter {
+    padding-bottom: 24px;
+  }
+  .chapter::after {
+    content: attr(data-num);
+    position: absolute;
+    right: 0;
+    top: 40px;
+    z-index: -1;
+    font: 800 44vw/0.8 var(--font-d);
+    letter-spacing: -0.04em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(242, 196, 107, 0.16);
+    pointer-events: none;
+  }
+  .chapter.is-on .chapter-media > img {
+    transform: scale(1.12);
+  }
+
+  /* the road to the next district */
+  .walk-next {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 4px var(--gutter) 8px;
+    text-align: center;
+  }
+  .walk-next-line {
+    position: relative;
+    width: 2px;
+    height: 84px;
+    background: repeating-linear-gradient(180deg, rgba(242, 196, 107, 0.55) 0 6px, transparent 6px 12px);
+  }
+  .walk-next-line::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    border-radius: 50%;
+    background: var(--gold-bright);
+    box-shadow: 0 0 14px 4px rgba(242, 196, 107, 0.55);
+    animation: walk-dot 2.4s ease-in-out infinite;
+  }
+  .walk-next em {
+    font-style: normal;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ash);
+  }
+  .walk-next em span {
+    margin: 0 4px;
+    font: 700 17px/1 var(--font-d);
+    color: var(--gold-bright);
+  }
+
+  /* voices: the row crossing the middle of the screen gets the stage light */
+  .tile.is-lit {
+    border-color: rgba(242, 196, 107, 0.55);
+  }
+  .tile.is-lit .tile-beam {
+    opacity: 1;
+  }
+  .tile.is-lit .tile-stage img {
+    transform: scale(1.05);
+  }
+  .tile.is-lit .tile-info h3 {
+    color: var(--gold-bright);
+  }
+}
+
+@keyframes walk-dot {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(74px);
+    opacity: 0;
+  }
+}
+
+/* scroll-driven depth on phones: runs on the compositor, skipped where unsupported or when motion is reduced */
+@supports (animation-timeline: view()) {
+  @media (max-width: 820px) and (prefers-reduced-motion: no-preference) {
+    .hero-inner {
+      animation: m-hero-out linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 85vh;
+    }
+    .legends {
+      animation: m-rise-over linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
+    }
+    .hero-city {
+      animation: m-sink linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
+    }
+    .chapter::after {
+      animation: m-ghost linear both;
+      animation-timeline: view();
+    }
+    .chapter-media > img {
+      animation: m-parallax linear both;
+      animation-timeline: view();
+    }
+    .section-head,
+    .walk-intro-copy,
+    .contact-copy,
+    .gate-si {
+      animation: m-heading linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 90%;
+    }
+    .reel,
+    .stage-wrap,
+    .videos {
+      animation: m-scale-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+
+@keyframes m-hero-out {
+  to {
+    opacity: 0.15;
+    translate: 0 -50px;
+  }
+}
+@keyframes m-rise-over {
+  to {
+    translate: 0 -14vh;
+  }
+}
+@keyframes m-sink {
+  to {
+    translate: 0 8vh;
+  }
+}
+@keyframes m-ghost {
+  from {
+    translate: 0 22vh;
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    translate: 0 -22vh;
+  }
+}
+@keyframes m-parallax {
+  from {
+    translate: 0 -5%;
+  }
+  to {
+    translate: 0 5%;
+  }
+}
+@keyframes m-heading {
+  from {
+    opacity: 0;
+    translate: 0 40px;
+  }
+}
+@keyframes m-scale-in {
+  from {
+    opacity: 0.3;
+    scale: 0.92;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

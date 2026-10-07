@@ -27,6 +27,51 @@ export default function Hero() {
   const [named, setNamed] = useState<string | null>(null);
   const label = named ? voices.find((v) => v.cut === named) : undefined;
   const at = named ? ensemble[named] : undefined;
+  // phones can't hover, so a spotlight steps through the artists and names each one
+  const [featured, setFeatured] = useState<string | null>(null);
+  const spot = featured ? voices.find((v) => v.cut === featured) : undefined;
+
+  useEffect(() => {
+    const el = hero.current;
+    const mq = window.matchMedia("(max-width: 820px)");
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let timer = 0;
+    let kick = 0;
+    let i = 0;
+    let visible = true;
+    let ready = !!document.documentElement.dataset.introDone;
+    const step = () => {
+      if (!mq.matches || !visible || !ready) return;
+      setFeatured(voices[i % voices.length].cut);
+      i++;
+    };
+    const start = () => {
+      window.clearInterval(timer);
+      window.clearTimeout(kick);
+      if (!mq.matches) {
+        setFeatured(null);
+        return;
+      }
+      kick = window.setTimeout(step, 2200);
+      timer = window.setInterval(step, 2600);
+    };
+    const onReady = () => {
+      ready = true;
+      start();
+    };
+    window.addEventListener("sanka:intro-done", onReady);
+    mq.addEventListener("change", start);
+    const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0.25 });
+    io.observe(el);
+    if (ready) start();
+    return () => {
+      window.clearInterval(timer);
+      window.clearTimeout(kick);
+      window.removeEventListener("sanka:intro-done", onReady);
+      mq.removeEventListener("change", start);
+      io.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     const el = hero.current;
@@ -66,13 +111,13 @@ export default function Hero() {
         <span />
       </div>
 
-      <ul className="legends" aria-label="Artists who have sung at Snehaye Nagaraya">
+      <ul className={`legends${featured ? " has-featured" : ""}`} aria-label="Artists who have sung at Snehaye Nagaraya">
         {voices.map((v, i) => {
           const p = ensemble[v.cut];
           return (
             <li
               key={v.name}
-              className="legend"
+              className={`legend${featured === v.cut ? " is-featured" : ""}`}
               style={
                 {
                   "--x": `${p.x}%`,
@@ -107,6 +152,16 @@ export default function Hero() {
       </ul>
 
       <City mode="hero" className="hero-city" />
+
+      {/* Phone spotlight caption: who is lit right now */}
+      <p className="legend-spot" aria-hidden="true">
+        {spot && (
+          <span key={spot.cut}>
+            <strong>{spot.name}</strong>
+            <small>{spot.known}</small>
+          </span>
+        )}
+      </p>
 
       {/* Name label lives above the skyline and the other portraits so it is never covered */}
       <p

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { services } from "../content";
 
 // A stage drawn in SVG. Each service lights up its own layer of the rig;
@@ -46,6 +46,27 @@ const garland = (() => {
 
 export default function Services() {
   const [active, setActive] = useState<string | null>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const touched = useRef(false);
+
+  useEffect(() => {
+    const el = stage.current;
+    const mq = window.matchMedia("(max-width: 820px)");
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let visible = false;
+    let i = 0;
+    const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0.6 });
+    io.observe(el);
+    const id = window.setInterval(() => {
+      if (!mq.matches || !visible || touched.current) return;
+      setActive(services[i % services.length].id);
+      i++;
+    }, 2600);
+    return () => {
+      window.clearInterval(id);
+      io.disconnect();
+    };
+  }, []);
 
   return (
     <section className="services" id="services" aria-labelledby="services-title">
@@ -58,7 +79,7 @@ export default function Services() {
       </header>
 
       <div className="services-grid">
-        <div className="stage-wrap" data-anim>
+        <div className="stage-wrap" data-anim ref={stage}>
           <svg
             className="stage-svg"
             data-active={active ?? "all"}
@@ -230,7 +251,10 @@ export default function Services() {
                 aria-pressed={active === s.id}
                 onPointerEnter={(e) => e.pointerType === "mouse" && setActive(s.id)}
                 onFocus={() => setActive(s.id)}
-                onClick={() => setActive(s.id)}
+                onClick={() => {
+                  touched.current = true;
+                  setActive(s.id);
+                }}
               >
                 <span className="service-name">{s.name}</span>
                 <span className="service-blurb">

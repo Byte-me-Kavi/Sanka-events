@@ -3,7 +3,7 @@
 import { ArrowRight } from "@phosphor-icons/react";
 import { motion, useInView, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { editions, voices, type Edition } from "../content";
 import City from "./City";
 import HoverColor from "./HoverColor";
@@ -89,7 +89,14 @@ function Chapter({
   }));
 
   return (
-    <article className={`chapter${on ? " is-on" : ""}`} ref={ref} id={`night-${e.id}`} aria-labelledby={`night-${e.id}-title`}>
+    <article
+      className={`chapter${on ? " is-on" : ""}`}
+      ref={ref}
+      id={`night-${e.id}`}
+      data-index={index}
+      data-num={e.number}
+      aria-labelledby={`night-${e.id}-title`}
+    >
       <div className="chapter-media">
         {e.image ? (
           <Image src={e.image} alt={e.imageAlt ?? ""} fill sizes="(max-width: 820px) 92vw, 40vw" />
@@ -288,10 +295,47 @@ export default function Editions() {
 
   const night = active >= 1 && active <= editions.length ? editions[active - 1] : null;
 
+  // phones: which chapter is in the middle of the screen drives the sticky bar
+  const [mIndex, setMIndex] = useState(-1);
+  useEffect(() => {
+    if (horizontal) return;
+    const sec = section.current;
+    if (!sec) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) if (en.isIntersecting) setMIndex(Number((en.target as HTMLElement).dataset.index));
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+    sec.querySelectorAll(".chapter").forEach((c) => io.observe(c));
+    return () => io.disconnect();
+  }, [horizontal]);
+  const mNight = mIndex >= 0 ? editions[mIndex] : null;
+
   return (
     <section className="walk" id="city" ref={section} aria-labelledby="walk-title">
       <div className="walk-sticky">
         <City mode="walk" panRef={pan} className="walk-city" />
+
+        <div className="walk-mbar" aria-hidden="true">
+          <p>
+            {mNight ? (
+              <>
+                You are in <strong key={mNight.id}>{mNight.city}</strong>
+                <span>
+                  Night {mIndex + 1}, {mNight.number}
+                </span>
+              </>
+            ) : (
+              <>
+                Entering <strong>the city of love</strong>
+              </>
+            )}
+          </p>
+          <div className="walk-mbar-line">
+            <motion.span style={{ scaleX: scrollYProgress }} />
+          </div>
+        </div>
 
         <motion.div className="walk-track" ref={track} style={{ x }}>
           <div className={`walk-intro${active === 0 || !horizontal ? " is-on" : ""}`}>
@@ -318,9 +362,26 @@ export default function Editions() {
             </ol>
           </div>
 
-          {editions.map((e, i) => (
-            <Chapter key={e.id} e={e} index={i} active={active === i + 1} horizontal={horizontal} onPhoto={openPhoto} />
-          ))}
+          {editions.map((e, i) => {
+            const next = editions[i + 1];
+            return (
+              <Fragment key={e.id}>
+                <Chapter e={e} index={i} active={active === i + 1} horizontal={horizontal} onPhoto={openPhoto} />
+                <div className="walk-next" aria-hidden="true">
+                  <span className="walk-next-line" />
+                  <em>
+                    {next ? (
+                      <>
+                        Next stop <span lang="si">{citySi[next.city]}</span> {next.city}
+                      </>
+                    ) : (
+                      "The city is complete"
+                    )}
+                  </em>
+                </div>
+              </Fragment>
+            );
+          })}
 
           <Gate active={active === stops - 1} horizontal={horizontal} />
         </motion.div>
