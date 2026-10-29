@@ -132,12 +132,4 @@ export type Video =
   | { kind: "facebook"; url: string; title: string; note: string }
   | { kind: "file"; src: string; poster?: string; title: string; note: string };
 
-export const videos: Video[] = [
-  {
-    kind: "youtube",
-    id: "A_KT_TpVlZ8",
-    title: "Snehaye Nagarayai",
-    note: "The song the concert series is named after, sung by Amarasiri Peiris and Manik Jayasekara.",
-    thumb: "/images/song-thumb.jpg",
-  },
-];
+export const videos: Video[] = [];
