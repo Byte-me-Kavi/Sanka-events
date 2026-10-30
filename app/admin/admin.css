@@ -222,7 +222,12 @@
   font-size: 15px;
   font-weight: 600;
 }
-.adm-top-signout {
+.adm-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.adm-top-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -235,10 +240,10 @@
   font: 600 14px/1 var(--font-b);
   cursor: pointer;
 }
-.adm-top-signout:hover {
+.adm-top-btn:hover {
   background: rgba(255, 255, 255, 0.1);
 }
-.adm-top-signout:focus-visible {
+.adm-top-btn:focus-visible {
   outline-color: #fff;
 }
 .adm-main {
@@ -884,6 +889,28 @@
   margin: 0;
 }
 
+/* Confirmation shown inside a sheet after a change succeeds */
+.adm-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 4px 0;
+  text-align: center;
+  color: var(--ink-2);
+}
+.adm-done > svg {
+  color: var(--good-mark);
+}
+.adm-done-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.adm-done .adm-btn {
+  margin-top: 14px;
+}
+
 /* ---------- Forms ---------- */
 .adm-form {
   display: flex;
@@ -1232,6 +1259,19 @@
 }
 
 @media (max-width: 420px) {
+  .adm-top-btn {
+    width: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+  .adm-top-btn span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
   .adm-stats {
     grid-template-columns: 1fr;
   }

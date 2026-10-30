@@ -1,8 +1,9 @@
 "use server";
 
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { ADMIN_EMAIL } from "@/lib/admin";
+import { ADMIN_EMAIL, MIN_PASSWORD } from "@/lib/admin";
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, parseAmount } from "@/lib/budget";
 import { createClient, requireAdmin } from "@/lib/supabase/server";
 
@@ -38,6 +39,43 @@ export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/admin");
+}
+
+// Signed-in only; there is deliberately no "forgot password" flow.
+export async function changePassword(_prev: FormState, fd: FormData): Promise<FormState> {
+  const supabase = await requireAdmin();
+  const current = String(fd.get("current") ?? "");
+  const next = String(fd.get("next") ?? "");
+  const confirm = String(fd.get("confirm") ?? "");
+
+  if (!current || !next || !confirm) return { error: "Fill in all three boxes." };
+  if (next.length < MIN_PASSWORD) return { error: `The new password needs at least ${MIN_PASSWORD} characters.` };
+  if (next !== confirm) return { error: "The two new passwords don't match. Type them again." };
+  if (next === current) return { error: "The new password must be different from the current one." };
+
+  // Check the current password on a throwaway client so the browser's session cookie is untouched.
+  // Its fresh session also satisfies Supabase's "recent sign-in" rule for password changes.
+  const verifier = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+  const { error: signInError } = await verifier.auth.signInWithPassword({ email: ADMIN_EMAIL, password: current });
+  if (signInError) {
+    return signInError.code === "over_request_rate_limit"
+      ? { error: "Too many attempts. Wait a few minutes and try again." }
+      : { error: "Your current password is wrong." };
+  }
+
+  const { error } = await verifier.auth.updateUser({ password: next, current_password: current });
+  await verifier.auth.signOut({ scope: "local" });
+  if (error) {
+    if (error.code === "weak_password") return { error: "That password is too easy to guess. Try a longer one with words and numbers." };
+    if (error.code === "same_password") return { error: "The new password must be different from the current one." };
+    return { error: "Couldn't change the password. Check your connection and try again." };
+  }
+
+  // Anyone else holding an old session (another phone, a shared laptop) is signed out; this device stays in.
+  await supabase.auth.signOut({ scope: "others" });
+  return { ok: true };
 }
 
 // ---------- Concerts ----------
