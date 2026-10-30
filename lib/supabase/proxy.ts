@@ -9,6 +9,8 @@ export async function updateSession(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
+      // Sessions only ever live on the server here, so page scripts never need to read the token.
+      cookieOptions: { httpOnly: true },
       cookies: {
         getAll() {
           return request.cookies.getAll();
